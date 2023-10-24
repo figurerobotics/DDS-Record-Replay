@@ -81,6 +81,50 @@ class DdsDomainDialog(QDialog):
     def get_dds_domain(self):
         """Return DDS Domain from spin box as integer value."""
         return int(self.spin_box.value())
+    
+
+class DdsTopicNameDialog(QDialog):
+    """Class that implements the a dialog to set the DDS command and status topic names."""
+
+    def __init__(self, current_command_topic, current_status_topic):
+        """Construct the dialog to set the DDS command and status topic names."""
+        super().__init__()
+
+        self.command_topic_label = QLabel('Enter command topic name:')
+        self.command_text_box = QLineEdit(self)
+        self.command_text_box.setText(current_command_topic)
+
+        self.status_topic_label = QLabel('Enter status topic name:')
+        self.status_text_box = QLineEdit(self)
+        self.status_text_box.setText(current_status_topic)
+
+        self.buttonBox = QDialogButtonBox(
+            QDialogButtonBox.StandardButton.Save
+            | QDialogButtonBox.StandardButton.Cancel)
+        self.buttonBox.accepted.connect(self.accept)
+        self.buttonBox.rejected.connect(self.reject)
+
+        command_layout = QVBoxLayout()
+        command_layout.addWidget(self.command_topic_label)
+        command_layout.addWidget(self.command_text_box)
+
+        status_layout = QVBoxLayout()
+        status_layout.addWidget(self.status_topic_label)
+        status_layout.addWidget(self.status_text_box)
+
+        horiznontal_layout = QHBoxLayout()
+        horiznontal_layout.addLayout(command_layout)
+        horiznontal_layout.addLayout(status_layout)
+
+        self.setLayout(horiznontal_layout)
+
+    def get_command_topic(self):
+        """Return DDS command topic from the text box."""
+        return self.command_text_box.text()
+
+    def get_status_topic(self):
+        """Return DDS status topic from the text box."""
+        return self.status_text_box.text()
 
 
 class DdsTopicNameDialog(QDialog):
