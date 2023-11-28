@@ -47,6 +47,7 @@ using DdsRecorderState = eprosima::ddsrecorder::recorder::DdsRecorderStateCode;
 using json = nlohmann::json;
 
 const std::string NEXT_STATE_TAG = "next_state";
+const int STATUS_PUBLISH_PERIOD_MS = 100;
 constexpr auto string_to_command = eprosima::ddsrecorder::recorder::receiver::string_to_enumeration;
 // constexpr auto string_to_state = eprosima::ddsrecorder::recorder::string_to_enumeration;  // TODO: fix compilation error
 
@@ -305,6 +306,14 @@ int main(
             command = state_to_command(initial_state);
 
             prev_command = CommandCode::close;
+            // Start a periodic thread to publish status
+            auto status_publish_thread = std::make_unique<eprosima::utils::event::PeriodicEventHandler>([&receiver, &command, &prev_command]()
+                {
+                    if (command != CommandCode::close)
+                    {
+                        receiver.publish_status(command, prev_command);
+                    }
+                }, STATUS_PUBLISH_PERIOD_MS);
             do
             {
                 // Skip waiting for commmand if initial_state is RUNNING/PAUSED/SUSPENDED (only applies to first iteration)
@@ -313,12 +322,6 @@ int main(
                     //////////////////////////
                     //// STATE -> STOPPED ////
                     //////////////////////////
-
-                    // Publish state if previous -> CLOSED/RUNNING/PAUSED/SUSPENDED
-                    if (prev_command != CommandCode::stop)
-                    {
-                        receiver.publish_status(CommandCode::stop, prev_command);
-                    }
 
                     prev_command = CommandCode::stop;
                     parse_command(receiver.wait_for_command(), command, args);
@@ -347,9 +350,6 @@ int main(
                             continue;
                     }
                 }
-
-                // STOPPED/CLOSED -> RUNNING/PAUSED/SUSPENDED
-                receiver.publish_status(command, prev_command);
 
                 // Set handler state on creation to avoid race condition (reception of data/schema prior to start/pause/suspend)
                 if (command == CommandCode::start)
@@ -408,10 +408,6 @@ int main(
                             {
                                 recorder->start();
                             }
-                            if (prev_command != CommandCode::start)
-                            {
-                                receiver.publish_status(CommandCode::start, prev_command);
-                            }
                             break;
 
                         case CommandCode::pause:
@@ -419,20 +415,12 @@ int main(
                             {
                                 recorder->pause();
                             }
-                            if (prev_command != CommandCode::pause)
-                            {
-                                receiver.publish_status(CommandCode::pause, prev_command);
-                            }
                             break;
 
                         case CommandCode::suspend:
                             if (!first_iter)
                             {
                                 recorder->suspend();
-                            }
-                            if (prev_command != CommandCode::suspend)
-                            {
-                                receiver.publish_status(CommandCode::suspend, prev_command);
                             }
                             break;
 
@@ -502,9 +490,6 @@ int main(
 
                 } while (command != CommandCode::stop && command != CommandCode::close);
             } while (command != CommandCode::close);
-
-            // Transition to CLOSED state
-            receiver.publish_status(CommandCode::close, prev_command);
         }
         else
         {

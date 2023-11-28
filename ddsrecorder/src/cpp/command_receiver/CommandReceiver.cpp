@@ -295,7 +295,7 @@ void CommandReceiver::publish_status(
     {
         status.info(info);
     }
-    logUser(
+    logInfo(
         DDSRECORDER_COMMAND_RECEIVER,
         "Publishing status: " << status.previous() << " ---> " << status.current() <<  " with info [" << status.info() <<
             " ].");
