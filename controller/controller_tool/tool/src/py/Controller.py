@@ -176,7 +176,7 @@ class Controller(QObject):
         self.command_writer_listener = CommandWriterListener(self)
         writer_qos = fastdds.DataWriterQos()
         self.publisher.get_default_datawriter_qos(writer_qos)
-        writer_qos.reliability().kind = fastdds.RELIABLE_RELIABILITY_QOS
+        writer_qos.reliability().kind = fastdds.BEST_EFFORT_RELIABILITY_QOS
         writer_qos.durability().kind = fastdds.VOLATILE_DURABILITY_QOS
         writer_qos.history().kind = fastdds.KEEP_LAST_HISTORY_QOS
         writer_qos.history().size = 10
@@ -191,7 +191,7 @@ class Controller(QObject):
         self.status_reader_listener = StatusReaderListener(self)
         reader_qos = fastdds.DataReaderQos()
         self.subscriber.get_default_datareader_qos(reader_qos)
-        reader_qos.reliability().kind = fastdds.RELIABLE_RELIABILITY_QOS
+        reader_qos.reliability().kind = fastdds.BEST_EFFORT_RELIABILITY_QOS
         reader_qos.durability().kind = fastdds.TRANSIENT_LOCAL_DURABILITY_QOS
         reader_qos.history().kind = fastdds.KEEP_LAST_HISTORY_QOS
         reader_qos.history().size = 10

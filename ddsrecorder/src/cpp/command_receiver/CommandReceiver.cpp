@@ -175,7 +175,7 @@ bool CommandReceiver::init()
 
     // CREATE THE READER
     DataReaderQos rqos = DATAREADER_QOS_DEFAULT;
-    rqos.reliability().kind = RELIABLE_RELIABILITY_QOS;
+    rqos.reliability().kind = BEST_EFFORT_RELIABILITY_QOS;
     rqos.durability().kind = VOLATILE_DURABILITY_QOS;
     rqos.history().kind = KEEP_LAST_HISTORY_QOS;
     rqos.history().depth = 1; //TODO: increase?
@@ -215,7 +215,7 @@ bool CommandReceiver::init()
 
     // CREATE THE WRITER
     DataWriterQos wqos = DATAWRITER_QOS_DEFAULT;
-    wqos.reliability().kind = RELIABLE_RELIABILITY_QOS;
+    wqos.reliability().kind = BEST_EFFORT_RELIABILITY_QOS;
     wqos.durability().kind = TRANSIENT_LOCAL_DURABILITY_QOS;
     wqos.history().kind = KEEP_LAST_HISTORY_QOS;
     wqos.history().depth = 1;
