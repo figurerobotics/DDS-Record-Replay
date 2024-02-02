@@ -320,10 +320,13 @@ void CommandReceiver::publish_status(
     {
         status.info(info);
     }
-    logInfo(
-        DDSRECORDER_COMMAND_RECEIVER,
-        "Publishing status: " << status.previous() << " ---> " << status.current() <<  " with info [" << status.info() <<
-            " ].");
+    if (current != last_logged_state_) {
+        logUser(
+            DDSRECORDER_COMMAND_RECEIVER,
+            "Status Changing: " << status.previous() << " ---> " << status.current() <<  " with info [" <<
+                status.info() << " ].");
+        last_logged_state_ = current;
+    }
     status_writer_->write(&status);
 }
 

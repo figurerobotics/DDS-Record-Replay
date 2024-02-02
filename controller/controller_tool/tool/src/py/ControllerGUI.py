@@ -81,7 +81,6 @@ class DdsDomainDialog(QDialog):
     def get_dds_domain(self):
         """Return DDS Domain from spin box as integer value."""
         return int(self.spin_box.value())
-    
 
 class DdsTopicNameDialog(QDialog):
     """Class that implements the a dialog to set the DDS command and status topic names."""

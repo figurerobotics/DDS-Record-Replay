@@ -121,6 +121,8 @@ private:
     std::shared_ptr<eprosima::utils::event::MultipleEventHandler> event_handler_;
 
     std::shared_ptr<eprosima::ddspipe::participants::SimpleParticipantConfiguration> participant_configuration_;
+
+    CommandCode last_logged_state_{CommandCode::unknown};
 };
 
 } /* namespace receiver */
