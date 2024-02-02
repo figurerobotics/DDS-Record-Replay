@@ -14,6 +14,7 @@
 """Script implementing a remote controller for the DDS Recorder."""
 
 import json
+import time
 import os
 if os.name == 'nt':
     import win32api
@@ -36,6 +37,8 @@ import fastdds
 
 
 MAX_DDS_DOMAIN_ID = 232
+COMMAND_WRITE_REPEAT = 10
+COMMAND_WRITE_INTERVAL = 0.01
 
 
 class RecorderStatus(Enum):
@@ -201,9 +204,11 @@ class Controller(QObject):
         data = DdsRecorderCommand()
         data.command(command.name)
         data.args(args)
-        if (not self.command_writer.write(data)):
-            logger.error('Publish failed')
-            return False
+        for _ in range(COMMAND_WRITE_REPEAT):
+            if (not self.command_writer.write(data)):
+                logger.error('Publish failed')
+                return False
+            time.sleep(COMMAND_WRITE_INTERVAL)
 
         return True
 
