@@ -253,6 +253,7 @@ class ControllerGUI(QMainWindow):
 
         self.init_gui()
 
+        self.last_published_state = None
         # Connect controller signals to UI functions
         self.dds_controller.on_ddsrecorder_discovered.connect(
             self.on_ddsrecorder_discovered)
@@ -272,16 +273,19 @@ class ControllerGUI(QMainWindow):
     def on_ddsrecorder_status(self, previous_status, current_status, info):
         """Inform the status of remote DDS Recorder."""
         # Log entry with new status
-        self.add_log_entry(
-            DDS_RECORDER,
-            f'Update from {previous_status} to {current_status}')
+        if (current_status != self.last_published_state):
+            self.last_published_state = current_status
 
-        # Log entry with info
-        if info != '':
-            self.add_log_entry(DDS_RECORDER, f'Status information: {info}')
+            self.add_log_entry(
+                DDS_RECORDER,
+                f'Update from {previous_status} to {current_status}')
 
-        # Change status bar
-        self.update_status(RecorderStatus[current_status.upper()])
+            # Log entry with info
+            if info != '':
+                self.add_log_entry(DDS_RECORDER, f'Status information: {info}')
+
+            # Change status bar
+            self.update_status(RecorderStatus[current_status.upper()])
 
     def restart_controller(
             self,
